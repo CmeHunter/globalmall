@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>需求變更說明：折抵方案判斷專櫃抽成類別</title>
+<style>
+  :root {
+    --main: #1f4e79;
+    --main-light: #e8eff6;
+    --text: #222;
+    --muted: #666;
+    --line: #d0d7de;
+    --ok: #1a7f37;
+    --ng: #b42318;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #f5f6f8;
+    color: var(--text);
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .page {
+    max-width: 960px;
+    margin: 32px auto;
+    padding: 40px 48px;
+    background: #fff;
+    border: 1px solid var(--line);
+  }
+  header { border-bottom: 3px solid var(--main); padding-bottom: 16px; margin-bottom: 8px; }
+  h1 { margin: 0 0 8px; font-size: 26px; color: var(--main); }
+  .meta { color: var(--muted); font-size: 14px; }
+  .meta span { margin-right: 20px; }
+  .status {
+    display: inline-block;
+    padding: 2px 10px;
+    border: 1px solid var(--main);
+    color: var(--main);
+    font-size: 13px;
+    font-weight: bold;
+  }
+  h2 {
+    margin: 36px 0 12px;
+    padding-left: 10px;
+    border-left: 5px solid var(--main);
+    font-size: 20px;
+    color: var(--main);
+  }
+  h3 { margin: 24px 0 8px; font-size: 17px; }
+  p { margin: 8px 0; }
+  ul, ol { margin: 8px 0; padding-left: 24px; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 15px; }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--main-light); color: var(--main); white-space: nowrap; }
+  td.c, th.c { text-align: center; }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    background: #f0f2f4;
+    padding: 1px 5px;
+    font-size: 14px;
+  }
+  .summary {
+    background: var(--main-light);
+    padding: 16px 20px;
+    margin: 20px 0 8px;
+  }
+  .summary p { margin: 4px 0; }
+  .note { color: var(--muted); font-size: 14px; }
+  .ok { color: var(--ok); font-weight: bold; }
+  .ng { color: var(--ng); font-weight: bold; }
+  .box {
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+  footer {
+    margin-top: 40px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 13px;
+  }
+  @media (max-width: 700px) {
+    .page { margin: 0; padding: 24px 16px; border: none; }
+    table { font-size: 14px; }
+    th { white-space: normal; }
+  }
+  @media print {
+    body { background: #fff; font-size: 12pt; }
+    .page { margin: 0; padding: 0; border: none; max-width: none; }
+    h2 { break-after: avoid; }
+    table, .box { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <h1>需求變更說明：折抵方案判斷專櫃抽成類別</h1>
+  <div class="meta">
+    <span>文件日期：2026-11-20</span>
+    <span>狀態：<span class="status">待確認，確認後開始開發</span></span>
+  </div>
+</header>
+
+<div class="summary">
+  <p><strong>需求：</strong>EC 在查詢會員時傳入專櫃抽成代碼，讓系統依抽成代碼選出對應的點數折抵方案。</p>
+  <p><strong>做法：</strong>後台「折抵方案設定」新增兩個欄位；EC 使用的兩支 API 各新增一個選填欄位；POS 點數扣抵也套用新設定。</p>
+  <p><strong>影響：</strong>新欄位都是選填。沒有設定、沒有傳入時，照現行規則判斷，現有的折抵方案與 EC、POS、APP 串接都不受影響。</p>
+</div>
+
+<h2>一、已確認事項</h2>
+<table>
+  <tr><th>項目</th><th>決定</th></tr>
+  <tr><td>EC 查詢會員時傳入幾個抽成代碼</td><td>一個</td></tr>
+  <tr><td>EC 點數折抵時是否再傳一次</td><td>要，再傳一次相同的抽成代碼</td></tr>
+  <tr><td>套用範圍</td><td>EC 與 POS 都套用；現有方案與現有串接方式維持原樣</td></tr>
+  <tr><td>抽成比例範圍</td><td>開放在後台設定（目前固定 7%～100%）</td></tr>
+  <tr><td>POS 交易有商品不符合方案限定的抽成類別時</td><td>跟現在一樣，整筆不能折抵</td></tr>
+  <tr><td>折抵方案列表</td><td>不顯示新欄位</td></tr>
+  <tr><td>沒有設定「限定抽成類別」的方案</td><td>一律用現金抽成代碼 <code>0</code> 判斷，跟現在完全一樣，不受 EC 傳入的代碼影響</td></tr>
+</table>
+
+<h2>二、調整內容</h2>
+
+<h3>1. 後台「折抵方案設定」新增兩個欄位</h3>
+<table>
+  <tr><th>欄位</th><th>用途</th><th>設定方式</th><th>不設定時</th></tr>
+  <tr>
+    <td>限定抽成類別</td>
+    <td>這個方案只給哪些抽成類別使用</td>
+    <td>多選，選項為專櫃抽成資料裡的代碼與名稱</td>
+    <td>空白＝不限定，照現行規則判斷</td>
+  </tr>
+  <tr>
+    <td>抽成比例範圍</td>
+    <td>專櫃在該抽成類別下的抽成比例，要落在範圍內才能使用這個方案</td>
+    <td>填起、迄兩個數字（%），含頭尾</td>
+    <td>預設 7～100，跟現在一樣</td>
+  </tr>
+</table>
+<p>方案審核時也看得到這兩個欄位（唯讀）。</p>
+
+<h3>2. EC 使用的 API 各新增一個選填欄位</h3>
+<table>
+  <tr><th>API</th><th>新增欄位</th><th>說明</th></tr>
+  <tr>
+    <td>M01001 會員查詢</td>
+    <td><code>commission_code</code>（專櫃抽成代碼，選填）</td>
+    <td>系統依這個代碼挑選可用的折抵方案</td>
+  </tr>
+  <tr>
+    <td>T05005 EC 點數折抵</td>
+    <td><code>commission_code</code>（專櫃抽成代碼，選填）</td>
+    <td>請傳與 M01001 相同的代碼，系統會用同樣的規則再檢查一次</td>
+  </tr>
+</table>
+<p>訂單成立（T05001）、交易確認（T05002）與取消類 API 不變。</p>
+
+<h3>3. POS 點數扣抵套用新設定</h3>
+<p>POS 電文不變。方案設定了「限定抽成類別」時，交易裡每個商品的抽成類別都必須在清單內、比例也在範圍內；只要有一個不符合，整筆就不能折抵（與現在比例不符時的處理相同）。</p>
+
+<h2>三、系統判斷方式</h2>
+<p>系統依方案的「優先順序」由大到小逐一檢查，用第一個全部符合的方案：</p>
+<ol>
+  <li>方案<strong>沒有</strong>設定限定抽成類別：一律用現金抽成代碼 <code>0</code> 的比例比對抽成比例範圍（跟現在一樣）。</li>
+  <li>方案<strong>有</strong>設定限定抽成類別：
+    <ul>
+      <li>EC 傳入的抽成代碼必須在清單內（沒傳時視為 <code>0</code>）。</li>
+      <li>該專櫃在這個抽成代碼下的比例，必須在方案的抽成比例範圍內。</li>
+    </ul>
+  </li>
+  <li>專櫃查不到該抽成代碼的抽成資料時，這個方案不符合。</li>
+</ol>
+
+<h2>四、範例</h2>
+<p class="note">以下抽成代碼 A、B 與各比例為假設值，僅供說明。</p>
+
+<div class="box">
+  <strong>專櫃抽成資料（店別 TWEC、專櫃 40003）</strong>
+  <table>
+    <tr><th>抽成代碼</th><th>名稱</th><th class="c">抽成比例</th></tr>
+    <tr><td>0</td><td>現金</td><td class="c">8%</td></tr>
+    <tr><td>A</td><td>（假設）特價商品</td><td class="c">5%</td></tr>
+  </table>
+
+  <strong>後台設定的兩個方案</strong>
+  <table>
+    <tr><th>方案</th><th class="c">優先順序</th><th>限定抽成類別</th><th class="c">抽成比例範圍</th><th>折抵內容（舉例）</th></tr>
+    <tr><td>P1 低抽成專用</td><td class="c">2（先檢查）</td><td>A</td><td class="c">3～6</td><td>10 點折 2 元</td></tr>
+    <tr><td>P2 基礎方案</td><td class="c">1</td><td>空白（不限定）</td><td class="c">7～100</td><td>10 點折 3 元</td></tr>
+  </table>
+</div>
+
+<table>
+  <tr><th class="c">情境</th><th>EC 傳入</th><th>檢查 P1</th><th>檢查 P2</th><th class="c">結果</th></tr>
+  <tr>
+    <td class="c">1</td><td><code>A</code></td>
+    <td><span class="ok">符合</span>：A 在清單內，5% 在 3～6 之間</td>
+    <td>（不需檢查）</td>
+    <td class="c"><strong>P1</strong></td>
+  </tr>
+  <tr>
+    <td class="c">2</td><td><code>0</code></td>
+    <td><span class="ng">不符合</span>：0 不在清單內</td>
+    <td><span class="ok">符合</span>：不限定，用 0 的 8% 比對 7～100</td>
+    <td class="c"><strong>P2</strong></td>
+  </tr>
+  <tr>
+    <td class="c">3</td><td>不傳</td>
+    <td><span class="ng">不符合</span>：視為 0，不在清單內</td>
+    <td><span class="ok">符合</span>：同上</td>
+    <td class="c"><strong>P2</strong>（跟現在一樣）</td>
+  </tr>
+  <tr>
+    <td class="c">4</td><td><code>B</code></td>
+    <td><span class="ng">不符合</span>：B 不在清單內</td>
+    <td><span class="ok">符合</span>：不限定，仍用 0 的 8% 比對</td>
+    <td class="c"><strong>P2</strong></td>
+  </tr>
+</table>
+
+<h2>五、設定注意事項</h2>
+<ul>
+  <li><strong>限定抽成類別的方案，優先順序要設得比通用方案高。</strong>否則系統會先檢查到通用方案並直接採用，限定方案就用不到。</li>
+  <li><strong>抽成比例範圍含頭尾。</strong>例如設定 7～100 時，抽成剛好 7% 的專櫃也符合。</li>
+</ul>
+
+<h2>六、不受影響的部分</h2>
+<ul>
+  <li>現有的折抵方案：上線後「限定抽成類別」為空白、抽成比例範圍保留原值，判斷結果不變。</li>
+  <li>EC、POS、APP 現有的串接：不傳新欄位就照現行規則判斷，不需要配合修改。</li>
+  <li>後台新增方案時不填新欄位：結果與現在新增的方案相同。</li>
+</ul>
+
+<h2>七、需要 EC 廠商配合</h2>
+<ul>
+  <li>M01001 會員查詢<strong>每次呼叫</strong>都帶 <code>commission_code</code>。EC 一次結帳會呼叫 M01001 多次，每次都要帶相同的值，結果才會一致。</li>
+  <li>T05005 點數折抵帶與 M01001 相同的 <code>commission_code</code>。</li>
+  <li>API 規格書更新後會提供給廠商。</li>
+</ul>
+
+<h2>八、後續流程</h2>
+<ol>
+  <li>貴公司確認本說明內容。</li>
+  <li>開始開發。</li>
+  <li>測試區驗證，含現有方案行為不變的比對。</li>
+  <li>正式區上線，提供更新後的 API 規格書。</li>
+  <li>通知 EC 廠商開始傳入專櫃抽成代碼。</li>
+</ol>
+
+<h2>九、請協助確認</h2>
+<ol>
+  <li>本說明的調整內容是否符合需求。</li>
+  <li>EC 廠商是否能配合在 M01001 與 T05005 傳入專櫃抽成代碼。</li>
+</ol>
+
+<footer>本文件為需求變更說明，內容確認後才會開始開發。</footer>
+
+</div>
+</body>
+</html>
